@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Menús del Restaurante</title>
+</head>
+<body>
+    <h1>Lista de Menús</h1>
+    <ul id="listaMenus">
+    </ul>
+    <script>
+       document.addEventListener('DOMContentLoaded', cargarMenus);
+
+async function cargarMenus() {
+    try {
+        const respuesta = await fetch('/api/menus');
+        const menus = await respuesta.json(); 
+
+        const lista = document.getElementById('listaMenus'); 
+        lista.innerHTML = ''; 
+
+        menus.forEach(menu => {
+            const elemento = document.createElement('li');
+            elemento.innerHTML = `<strong>Menú Número:</strong> ${menu.numero} <br>
+                                  <strong>Primer Plato:</strong> ${menu.primerPlato} <br>
+                                  <strong>Segundo Plato:</strong> ${menu.segundoPlato} <br>
+                                  <strong>Postre:</strong> ${menu.postre} <br>
+                                  <strong>Precio:</strong> ${menu.precio}€
+                                  <button onclick="borrarMenu(${menu.numero})">Borrar Menú</button>`;
+            lista.appendChild(elemento);
+        });
+    } catch (error) {
+        console.error('Error al cargar los menús:', error);
+    }
+}
+
+async function borrarMenu(numeroMenu) {
+    try {
+        const respuesta = await fetch(`/api/borrarMenu/${numeroMenu}`, {
+            method: 'DELETE',
+        });
+        if (!respuesta.ok) throw new Error('No se pudo borrar el menú');
+
+        console.log('Menú borrado correctamente');
+        cargarMenus();
+    } catch (error) {
+        console.error('Error al borrar el menú:', error);
+    }
+}
+
+    </script>
+</body>
+</html>
